@@ -9,14 +9,10 @@ cloudinary.config({
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { file, folder, resource_type } = body;
+    const { file, folder, resource_type } = await req.json();
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No file provided" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     const uploadResponse = await cloudinary.uploader.upload(file, {
@@ -27,15 +23,11 @@ export async function POST(req: Request) {
     return NextResponse.json({
       url: uploadResponse.secure_url,
       public_id: uploadResponse.public_id,
-      bytes: uploadResponse.resource_type,
+      bytes: uploadResponse.bytes,
     });
 
   } catch (error: any) {
     console.error("❌ CLOUDINARY UPLOAD ERROR:", error);
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  
 }
