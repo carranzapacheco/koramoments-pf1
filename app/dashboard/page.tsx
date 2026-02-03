@@ -231,6 +231,11 @@ export default function Dashboard() {
       file,
       type === "photos" ? "image" : "video"
     );
+    console.log("RESULT CLOUDINARY:", result);
+
+    if (!result?.url || !result?.public_id || !result?.bytes) {
+      throw new Error("Upload incompleto a Cloudinary");
+    }
 
     const uploadedFile: MediaItem = {
       url: result.url,
@@ -272,7 +277,7 @@ export default function Dashboard() {
     setLoading(false);
   }
 };
-
+  
 
   //nuevo para editar descripción
   const updateMediaDescription = async (
