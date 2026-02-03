@@ -50,7 +50,7 @@ export default function Informacion() {
 
   return (
     <div
-      className="max-w-4xl md:max-w-6xl mx-auto px-8 md:px-12 py-5 bg-[#F5F1EC] rounded-2xl shadow-md mt-6 mb-20 md:mb-8 animate-fade-in-up">
+      className="max-w-4xl md:max-w-6xl mx-auto px-8 md:px-12 py-5 bg-[#FAF6F0] rounded-2xl shadow-md mt-6 mb-20 md:mb-8 animate-fade-in-up">
       <h2 className="text-2xl md:text-3xl font-serif text-[#2E2E2E] mb-4 flex items-center gap-2">
         <span className="h-1 w-6 bg-[#C2A46D] rounded-full" />
         Biografía

@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { Link as LinkIcon } from "lucide-react";
+import { ScrollReveal } from "@/components/ScrollReveal"; // tu componente nuevo
 
 /* ---------- TIPOS ---------- */
 
@@ -40,8 +41,9 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
   return (
     <div
       className="
-        mx-auto
+        w-full
         max-w-4xl
+        mx-auto
         rounded-2xl
         border
         shadow-lg
@@ -50,7 +52,6 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         ease-out
         hover:shadow-xl
         hover:-translate-y-1
-        animate-fadeIn
       "
       style={{
         backgroundColor: "#F5F1EC",
@@ -66,7 +67,7 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
           style={{ borderColor: "#C2A46D" }}
         >
           <img
-            src="/profiles/steffano-moya/perfil.jpg"
+            src="/profiles/steffano-moya/perfil.jpeg"
             alt={AUTHOR_NAME}
             className="w-full h-full object-cover"
           />
@@ -74,12 +75,8 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
 
         <div>
           <div className="flex items-center flex-wrap gap-x-2">
-            <span className="font-semibold text-base">
-              {AUTHOR_NAME}
-            </span>
-            <span className="text-sm italic opacity-70">
-              uploaded 1 photo
-            </span>
+            <span className="font-semibold text-base">{AUTHOR_NAME}</span>
+            <span className="text-sm italic opacity-70">uploaded 1 photo</span>
           </div>
 
           <div className="flex items-center text-xs mt-1 opacity-70">
@@ -89,16 +86,11 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         </div>
       </div>
 
-      {/* Descripción centrada */}
+      {/* Descripción */}
       {content && (
-        <div className="px-8 pb-6">
+        <div className="px-6 md:px-8 pb-6">
           <p
-            className="
-              text-lg
-              italic
-              leading-relaxed
-              animate-fadeUp
-            "
+            className="text-lg italic leading-relaxed"
             style={{ color: "#C48B9F" }}
           >
             “{content}”
@@ -111,8 +103,9 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         <img
           src={imageUrl}
           alt={content}
+          loading="lazy" // lazy load
           className="
-            max-h-[640px]
+            max-h-[345px]
             w-full
             object-contain
             transition-transform
@@ -123,7 +116,7 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         />
       </div>
 
-      {/* Footer minimal */}
+      {/* Footer */}
       <div
         className="p-6 pt-8 text-center text-xs opacity-60"
         style={{ borderTop: "1px solid #C2A46D" }}
@@ -140,7 +133,7 @@ export default function Fotos() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  /* ---------- PERFIL ---------- */
+  /* PERFIL */
   useEffect(() => {
     const fetchProfile = async () => {
       const ref = doc(db, "profiles", PROFILE_ID);
@@ -156,32 +149,24 @@ export default function Fotos() {
     fetchProfile();
   }, []);
 
-  /* ---------- TIMELINE ---------- */
+  /* TIMELINE */
   const timeline = useMemo<TimelineItem[]>(() => {
     if (!profile?.photos) return [];
 
     return profile.photos
       .filter((photo) => photo.createdAt)
-      .map((photo) => ({
-        createdAt: photo.createdAt!,
-        data: photo,
-      }))
-      .sort(
-        (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
-      );
+      .map((photo) => ({ createdAt: photo.createdAt!, data: photo }))
+      .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
   }, [profile]);
 
-  /* ---------- GUARDS ---------- */
+  /* GUARDS */
   if (loading) return <p className="p-8">Cargando…</p>;
   if (!profile) return <p className="p-8">Perfil no encontrado</p>;
 
-  /* ---------- RENDER ---------- */
+  /* RENDER */
   return (
-    <main
-      className="p-10 min-h-screen"
-      style={{ backgroundColor: "#F5F1EC" }}
-    >
-      <div className="space-y-16 max-w-6xl mx-auto">
+    <main className="px-4 md:px-10 py-10 min-h-screen bg-[#F5F1EC]">
+      <div className="space-y-16">
         {timeline.map((item, index) => {
           const date = item.createdAt.toDate().toLocaleString("es-PE", {
             dateStyle: "medium",
@@ -189,12 +174,13 @@ export default function Fotos() {
           });
 
           return (
-            <PhotoPost
-              key={index}
-              timestamp={date}
-              content={item.data.description || ""}
-              imageUrl={item.data.url}
-            />
+            <ScrollReveal key={index} className="mb-16">
+              <PhotoPost
+                timestamp={date}
+                content={item.data.description || ""}
+                imageUrl={item.data.url}
+              />
+            </ScrollReveal>
           );
         })}
       </div>

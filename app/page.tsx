@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { Link as LinkIcon } from "lucide-react";
 import { ProfileHeader } from "@/components/ProfileHeader";
+import {ScrollReveal} from "@/components/ScrollReveal"; // A
 
 /* ---------- TIPOS ---------- */
 
@@ -45,7 +46,7 @@ type TimelineItem = {
 
 const PROFILE_ID = "public";
 const AUTHOR_NAME = "Julio Steffano Vasquez Moya";
-const PROFILE_IMAGE = "/profiles/steffano-moya/perfil.jepg";
+const PROFILE_IMAGE = "/profiles/steffano-moya/perfil.jpeg";
 
 /* ---------- HEADER BASE ---------- */
 
@@ -60,7 +61,6 @@ const PostHeader = ({
 }) => {
   return (
     <div className="flex items-start p-6 space-x-4">
-      {/* Avatar */}
       <div
         className="w-14 h-14 rounded-full overflow-hidden border flex-shrink-0"
         style={{ borderColor: "#C2A46D" }}
@@ -91,13 +91,7 @@ const PostHeader = ({
 
 /* ---------- CARD BASE ---------- */
 
-const CardBase = ({
-  children,
-  index,
-}: {
-  children: React.ReactNode;
-  index: number;
-}) => (
+const CardBase = ({ children }: { children: React.ReactNode }) => (
   <div
     className="
       mx-auto
@@ -111,9 +105,9 @@ const CardBase = ({
       hover:shadow-xl
       hover:-translate-y-1
       animate-fade-in-up
+      w-full
     "
     style={{
-      animationDelay: `${index * 120}ms`,
       backgroundColor: "#F5F1EC",
       borderColor: "#C2A46D",
       color: "#2E2E2E",
@@ -125,27 +119,17 @@ const CardBase = ({
 
 /* ---------- FOTO ---------- */
 
-const PhotoPost = ({
-  item,
-  date,
-  index,
-}: {
-  item: MediaItem;
-  date: string;
-  index: number;
-}) => (
-  <CardBase index={index}>
+const PhotoPost = ({ item, date }: { item: MediaItem; date: string }) => (
+  <CardBase>
     <PostHeader
       name={AUTHOR_NAME}
       timestamp={date}
-      label="se compartió un recuerdo"
+      label="uploaded 1 photo"
     />
 
     {item.description && (
       <div className="px-10 mb-4">
-        <p className="italic text-[#C48B9F] text-lg">
-          “{item.description}”
-        </p>
+        <p className="italic text-[#C48B9F] text-lg">“{item.description}”</p>
       </div>
     )}
 
@@ -153,7 +137,7 @@ const PhotoPost = ({
       <img
         src={item.url}
         alt={item.description}
-        className="max-h-[520px] w-full object-contain"
+        className="max-h-[380px] w-full object-contain"
       />
     </div>
 
@@ -168,27 +152,17 @@ const PhotoPost = ({
 
 /* ---------- VIDEO ---------- */
 
-const VideoPost = ({
-  item,
-  date,
-  index,
-}: {
-  item: MediaItem;
-  date: string;
-  index: number;
-}) => (
-  <CardBase index={index}>
+const VideoPost = ({ item, date }: { item: MediaItem; date: string }) => (
+  <CardBase>
     <PostHeader
       name={AUTHOR_NAME}
       timestamp={date}
-      label="compartió un video"
+      label="uploaded 1 video"
     />
 
     {item.description && (
       <div className="px-10 mb-4">
-        <p className="italic text-[#C48B9F] text-lg">
-          “{item.description}”
-        </p>
+        <p className="italic text-[#C48B9F] text-lg">“{item.description}”</p>
       </div>
     )}
 
@@ -196,7 +170,7 @@ const VideoPost = ({
       <video
         src={item.url}
         controls
-        className="max-h-[520px] w-full object-contain"
+        className="max-h-[380px] w-full object-contain"
       />
     </div>
 
@@ -211,33 +185,12 @@ const VideoPost = ({
 
 /* ---------- COMENTARIO ---------- */
 
-const CommentPost = ({
-  item,
-  date,
-  index,
-}: {
-  item: Comment;
-  date: string;
-  index: number;
-}) => (
-  <CardBase index={index}>
-    <PostHeader
-      name={item.name}
-      timestamp={date}
-      label="dejó un recuerdo"
-    />
+const CommentPost = ({ item, date }: { item: Comment; date: string }) => (
+  <CardBase>
+    <PostHeader name={item.name} timestamp={date} label="dejó un recuerdo" />
 
     <div className="px-10 pb-8 text-center">
-      <p
-        className="
-          text-lg
-          leading-relaxed
-          italic
-          whitespace-pre-line
-          animate-fade-in-up
-        "
-        style={{ color: "#C48B9F" }}
-      >
+      <p className="text-lg leading-relaxed italic whitespace-pre-line animate-fade-in-up" style={{ color: "#C48B9F" }}>
         “{item.message}”
       </p>
     </div>
@@ -271,10 +224,7 @@ export default function Recuerdos() {
   /* COMENTARIOS */
   useEffect(() => {
     const fetchComments = async () => {
-      const q = query(
-        collection(db, "comments"),
-        orderBy("createdAt", "desc")
-      );
+      const q = query(collection(db, "comments"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       setComments(
         snap.docs.map((doc) => ({
@@ -291,40 +241,32 @@ export default function Recuerdos() {
     const items: TimelineItem[] = [];
 
     profile?.photos?.forEach((p) => {
-      if (p.createdAt)
-        items.push({ type: "photo", createdAt: p.createdAt, data: p });
+      if (p.createdAt) items.push({ type: "photo", createdAt: p.createdAt, data: p });
     });
 
     profile?.videos?.forEach((v) => {
-      if (v.createdAt)
-        items.push({ type: "video", createdAt: v.createdAt, data: v });
+      if (v.createdAt) items.push({ type: "video", createdAt: v.createdAt, data: v });
     });
 
     comments.forEach((c) => {
-      if (c.createdAt)
-        items.push({ type: "comment", createdAt: c.createdAt, data: c });
+      if (c.createdAt) items.push({ type: "comment", createdAt: c.createdAt, data: c });
     });
 
-    return items.sort(
-      (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
-    );
+    return items.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
   }, [profile, comments]);
 
   if (loading) return <p className="p-8">Cargando…</p>;
   if (!profile) return <p className="p-8">Perfil no encontrado</p>;
 
   return (
-    <main
-      className="p-12 min-h-screen"
-      style={{ backgroundColor: "#F5F1EC" }}
-    >
+    <main className="min-h-screen overflow-y-auto" style={{ backgroundColor: "#F5F1EC" }}>
       <ProfileHeader />
 
       <h2 className="p-12 text-3xl font-semibold text-center">
         Memorias que llenaran nuestro corazón ❤️
       </h2>
 
-      <div className="space-y-20 max-w-6xl mx-auto">
+      <div className="space-y-20 max-w-6xl mx-auto p-2">
         {timeline.map((item, index) => {
           const date = item.createdAt.toDate().toLocaleString("es-PE", {
             dateStyle: "medium",
@@ -333,32 +275,23 @@ export default function Recuerdos() {
 
           if (item.type === "photo")
             return (
-              <PhotoPost
-                key={index}
-                item={item.data}
-                date={date}
-                index={index}
-              />
+              <ScrollReveal key={index}>
+                <PhotoPost item={item.data} date={date} />
+              </ScrollReveal>
             );
 
           if (item.type === "video")
             return (
-              <VideoPost
-                key={index}
-                item={item.data}
-                date={date}
-                index={index}
-              />
+              <ScrollReveal key={index}>
+                <VideoPost item={item.data} date={date} />
+              </ScrollReveal>
             );
 
           if (item.type === "comment")
             return (
-              <CommentPost
-                key={index}
-                item={item.data}
-                date={date}
-                index={index}
-              />
+              <ScrollReveal key={index}>
+                <CommentPost item={item.data} date={date} />
+              </ScrollReveal>
             );
 
           return null;

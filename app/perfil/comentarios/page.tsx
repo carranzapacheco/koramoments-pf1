@@ -12,6 +12,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { Link as LinkIcon } from "lucide-react";
+import { ScrollReveal } from "@/components/ScrollReveal"; // tu componente nuevo
 
 /* ---------- TIPOS ---------- */
 
@@ -37,16 +38,13 @@ type CommentPostProps = {
   timestamp?: string;
 };
 
-const CommentPost = ({
-  name,
-  message,
-  timestamp,
-}: CommentPostProps) => {
+const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
   return (
     <div
       className="
-        mx-auto
+        w-full
         max-w-4xl
+        mx-auto
         rounded-2xl
         border
         shadow-lg
@@ -55,7 +53,6 @@ const CommentPost = ({
         ease-out
         hover:shadow-xl
         hover:-translate-y-1
-        animate-fadeIn
       "
       style={{
         backgroundColor: "#F5F1EC",
@@ -71,7 +68,7 @@ const CommentPost = ({
           style={{ borderColor: "#C2A46D" }}
         >
           <img
-            src="/profiles/steffano-moya/perfil.jpg"
+            src="/profiles/steffano-moya/perfil.jpeg"
             alt={AUTHOR_NAME}
             className="w-full h-full object-cover"
           />
@@ -79,12 +76,8 @@ const CommentPost = ({
 
         <div>
           <div className="flex items-center flex-wrap gap-x-2">
-            <span className="font-semibold text-base">
-              {name}
-            </span>
-            <span className="text-sm italic opacity-70">
-              dejó un recuerdo
-            </span>
+            <span className="font-semibold text-base">{name}</span>
+            <span className="text-sm italic opacity-70">dejó un recuerdo</span>
           </div>
 
           {timestamp && (
@@ -104,7 +97,6 @@ const CommentPost = ({
             leading-relaxed
             italic
             whitespace-pre-line
-            animate-fadeUp
           "
           style={{ color: "#C48B9F" }}
         >
@@ -117,7 +109,7 @@ const CommentPost = ({
         className="p-4 text-center text-xs opacity-60"
         style={{ borderTop: "1px solid #C2A46D" }}
       >
-        Kora Moments
+        Kora Memories
       </div>
     </div>
   );
@@ -130,7 +122,7 @@ export default function Comentarios() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* ---------- PERFIL ---------- */
+  /* PERFIL */
   useEffect(() => {
     const fetchProfile = async () => {
       const ref = doc(db, "profiles", PROFILE_ID);
@@ -146,7 +138,7 @@ export default function Comentarios() {
     fetchProfile();
   }, []);
 
-  /* ---------- COMENTARIOS ---------- */
+  /* COMENTARIOS */
   useEffect(() => {
     const fetchComments = async () => {
       const q = query(
@@ -167,35 +159,30 @@ export default function Comentarios() {
     fetchComments();
   }, []);
 
-  /* ---------- GUARDS ---------- */
+  /* GUARDS */
   if (loading) return <p className="p-8">Cargando…</p>;
   if (!profile) return <p className="p-8">Perfil no encontrado</p>;
 
-  /* ---------- RENDER ---------- */
+  /* RENDER */
   return (
-    <main
-      className="p-10 min-h-screen"
-      style={{ backgroundColor: "#F5F1EC" }}
-    >
-      <div className="space-y-16 max-w-6xl mx-auto">
+    <main className="px-4 md:px-10 py-10 min-h-screen bg-[#F5F1EC]">
+      <div className="space-y-16">
         {comments.map((c) => {
           const date = c.createdAt
-            ? new Date(c.createdAt.seconds * 1000).toLocaleString(
-                "es-PE",
-                {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                }
-              )
+            ? new Date(c.createdAt.seconds * 1000).toLocaleString("es-PE", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })
             : undefined;
 
           return (
-            <CommentPost
-              key={c.id}
-              name={c.name}
-              message={c.message}
-              timestamp={date}
-            />
+            <ScrollReveal key={c.id} className="mb-16">
+              <CommentPost
+                name={c.name}
+                message={c.message}
+                timestamp={date}
+              />
+            </ScrollReveal>
           );
         })}
       </div>

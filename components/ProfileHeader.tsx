@@ -25,7 +25,7 @@ export const ProfileHeader = () => {
     "https://wa.me/51914824316?text=Hola%2C%20tengo%20una%20duda%20sobre%20mi%20sitio%20web..";
 
   return (
-    <div className="max-w-4xl md:max-w-6xl mx-auto bg-[#F5F1EC] rounded-b-2xl overflow-hidden shadow-md">
+    <div className="p-1 max-w-4xl md:max-w-6xl mx-auto bg-[#F5F1EC] rounded-b-2xl overflow-hidden shadow-md">
       {/* Portada */}
       <div className="relative">
         <div className="h-64 md:h-80 overflow-hidden">
