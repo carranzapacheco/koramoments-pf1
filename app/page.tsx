@@ -45,7 +45,7 @@ type TimelineItem = {
 
 const PROFILE_ID = "public";
 const AUTHOR_NAME = "Julio Steffano Vasquez Moya";
-const PROFILE_IMAGE = "/profiles/steffano-moya/perfil.jpg";
+const PROFILE_IMAGE = "/profiles/steffano-moya/perfil.jepg";
 
 /* ---------- HEADER BASE ---------- */
 
