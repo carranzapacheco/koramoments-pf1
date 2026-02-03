@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import { uploadVideoDirectToCloudinary } from "@/lib/uploadVideoDirect";
 import {
   collection,
   addDoc,
@@ -227,10 +228,11 @@ export default function Dashboard() {
   try {
     setLoading(true);
 
-    const result = await uploadToCloudinary(
-      file,
-      type === "photos" ? "image" : "video"
-    );
+    const result =
+      type === "videos"
+        ? await uploadVideoDirectToCloudinary(file)
+        : await uploadToCloudinary(file, "image");
+
     console.log("RESULT CLOUDINARY:", result);
 
     if (!result?.url || !result?.public_id || !result?.bytes) {
