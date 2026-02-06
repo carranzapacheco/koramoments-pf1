@@ -260,7 +260,9 @@ export default function Dashboard() {
 
     await updateDoc(ref, {
       totalStorageUsed: increment(uploadedFile.bytes),
+
     });
+
 
     if (type === "photos") {
       setPhotoFile(null);

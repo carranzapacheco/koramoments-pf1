@@ -10,14 +10,15 @@ export const useStorageUsage = (profileId: string) => {
   useEffect(() => {
     const ref = doc(db, "profiles", profileId);
 
-    return onSnapshot(ref, (snap) => {
-      if (!snap.exists()) return;
-
-      const usedBytes = snap.data().totalStorageUsed || 0;
-      console.log("Total usado en Firestore:", usedBytes); // ✅ sin `/`
+    // Listener en tiempo real
+    const unsubscribe = onSnapshot(ref, (snap) => {
+      const data = snap.data();
+      const usedBytes = data?.totalStorageUsed || 0;
       setUsed(usedBytes);
-      setPercentage(Math.min(Math.round((usedBytes / STORAGE_LIMIT) * 100), 100));
+      setPercentage((usedBytes / STORAGE_LIMIT) * 100);
     });
+
+    return () => unsubscribe();
   }, [profileId]);
 
   return { used, percentage };

@@ -266,7 +266,7 @@ export default function Recuerdos() {
         Memorias que llenaran nuestro corazón ❤️
       </h2>
 
-      <div className="space-y-20 max-w-6xl mx-auto p-2">
+      <div className="space-y-20 max-w-6xl mx-auto p-2 py-15">
         {timeline.map((item, index) => {
           const date = item.createdAt.toDate().toLocaleString("es-PE", {
             dateStyle: "medium",

@@ -22,16 +22,13 @@ export const Footer: React.FC = () => {
         {/* Logo centrado */}
         <div className="flex flex-col items-center text-center">
           <Image
-            src="/logo.png"
+            src="/Logo-full.png"
             alt="Kora Memories"
-            width={120}
+            width={400}
             height={120}
             priority
-            className="mb-2 drop-shadow-xl bg-[#c2a46d93] p-2 rounded-full"
+            className="mb-2 drop-shadow-xl p-2"
           />
-          <h2 className="text-[#C2A46D] text-2xl md:text-3xl font-serif tracking-widest uppercase">
-            Kora Memories
-          </h2>
         </div>
 
         {/* Contacto y redes */}
