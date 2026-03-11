@@ -1,5 +1,15 @@
 'use client';
 
+import StorageCard from "@/components/dashboard/StorageCard";
+import AdminPanel from "@/components/dashboard/AdminPanel";
+import BiographySection from "@/components/dashboard/BiographySection";
+import PhotosSection from "@/components/dashboard/PhotosSection";
+import VideosSection from "@/components/dashboard/VideosSection";
+import CommentsSection from "@/components/dashboard/CommentsSection";
+import BioToast from "@/components/dashboard/BioToast";
+import AlertToast from "@/components/dashboard/AlertToast";
+import ConfirmModal from "@/components/dashboard/ConfirmModal";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
@@ -113,8 +123,6 @@ export default function Dashboard() {
   setOnConfirmAction(() => action); // guarda la acción a ejecutar
   setShowConfirmModal(true); // muestra el modal
   };
-
-
 
   /* ===================== AUTH ===================== */
   useEffect(() => {
@@ -433,652 +441,90 @@ export default function Dashboard() {
   };
 
   return (
-  <div className="p-8 max-w-5xl mx-auto bg-[#F5F1EC] text-[#2E2E2E] space-y-12">
-
-    <h1 className="text-3xl font-semibold tracking-tight">
-      Dashboard
-    </h1>
-
-    {/* ===================== STORAGE ===================== */}
-    <div className="bg-white p-5 rounded-xl shadow transition hover:shadow-lg">
-      <p className="text-sm mb-2 font-medium">
-        Almacenamiento usado: {usedMB} MB / {totalMB} MB
-      </p>
-
-      <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full transition-all duration-500 ease-out"
-          style={{
-            width: `${percentage}%`,
-            backgroundColor:
-              percentage < 70
-                ? "#C48B9F"
-                : percentage < 90
-                ? "#C2A46D"
-                : "#dc2626",
-          }}
-        />
-      </div>
-
-      {percentage >= 90 && (
-        <p className="text-sm text-red-600 mt-2 animate-pulse">
-          ⚠️ Estás cerca del límite de almacenamiento
-        </p>
-      )}
-    </div>
-
-    {/* ===================== ADMIN ===================== */}
-    {user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
-      <div className="bg-white p-5 rounded-xl shadow border border-red-200">
-        <button
-          onClick={limpiarTodo}
-          className="bg-red-600 text-white px-4 py-2 rounded-md
-                     transition hover:bg-red-700 hover:scale-[1.02]"
-        >
-          Limpiar todo el almacenamiento
-        </button>
-
-        <p className="text-sm text-gray-500 mt-2">
-          ⚠️ Acción solo para administrador. Elimina todos los archivos.
-        </p>
-      </div>
-    )}
-
-    {/* ===================== BIO ===================== */}
-    <div className="bg-white p-5 rounded-xl shadow">
-      <h2 className="font-semibold mb-3">Biografía</h2>
-
-      <textarea
-        value={biography}
-        onChange={(e) =>
-          setBiography(e.target.value.slice(0, BIO_MAX + 10))
-        }
-        className={`w-full min-h-[140px] rounded-md border p-3
-          focus:outline-none focus:ring-2
-          ${
-            biography.length > BIO_MAX
-              ? "border-red-500 focus:ring-red-300"
-              : "focus:ring-[#C48B9F]"
-          }`}
-      />
-
-      <p
-        className={`text-sm mt-1 ${
-          biography.length > BIO_MAX
-            ? "text-red-600"
-            : "text-gray-500"
-        }`}
-      >
-        {biography.length} / {BIO_MAX} caracteres
-      </p>
-
-      <button
-        onClick={saveBiography}
-        disabled={biography.length > BIO_MAX}
-        className={`mt-3 px-4 py-2 rounded-md text-white transition
-          ${
-            biography.length > BIO_MAX
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-[#C48B9F] hover:bg-[#C2A46D]"
-          }`}
-      >
-        Guardar
-      </button>
-    </div>
-
-    {/* ===================== FOTOS ===================== */}
-    <div className="bg-white p-5 rounded-xl shadow space-y-4">
-      <h2 className="font-semibold">
-        Fotos <span className="text-sm text-gray-500">(según espacio)</span>
-      </h2>
-
-    <input
-      type="file"
-      accept="image/*"
-      id="photoInput"
-      className="hidden"
-      onChange={(e) =>
-        setPhotoFile(e.target.files?.[0] || null)
-      }
-    />
-
-    <button
-      type="button"
-      onClick={() =>
-        document.getElementById("photoInput")?.click()
-      }
-      className="px-4 py-2 rounded-md
-                bg-[#F5F1EC]
-                border border-[#C48B9F]
-                text-[#2E2E2E]
-                font-medium
-                hover:bg-[#C48B9F] hover:text-white
-                transition-all duration-200
-                hover:scale-[1.02]"
-    >
-      Seleccionar foto
-    </button>
-
-    <div
-      className={`mt-3 overflow-hidden transition-all duration-300 ease-out
-        ${photoFile ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"}
-      `}
-    >
-      {photoFile && (
-        <div className="bg-[#F5F1EC] rounded-lg p-3 flex gap-3 items-start">
-          <img
-            src={URL.createObjectURL(photoFile)}
-            alt="Preview"
-            className="w-20 h-20 object-cover rounded-md shadow"
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <>
+          <StorageCard
+            usedMB={usedMB}
+            totalMB={totalMB}
+            percentage={percentage}
           />
 
-          <div className="text-sm text-gray-700 space-y-1">
-            <p>📸 <span className="font-medium">{photoFile.name}</span></p>
-            <p>📦 {(photoFile.size / 1024 / 1024).toFixed(2)} MB</p>
-
-            <button
-              type="button"
-              onClick={() => setPhotoFile(null)}
-              className="text-red-500 hover:text-red-700 text-xs"
-            >
-              Quitar archivo
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-
-
-      <input
-        type="text"
-        placeholder="Descripción de la foto"
-        value={photoDescription}
-        onChange={(e) =>
-          setPhotoDescription(
-            e.target.value.slice(0, PHOTO_DESC_MAX + 10)
-          )
-        }
-        className={`w-full border rounded-md p-2 ${
-          photoDescription.length > PHOTO_DESC_MAX
-            ? "border-red-500"
-            : ""
-        }`}
-      />
-
-      <p className={`text-sm ${
-        photoDescription.length > PHOTO_DESC_MAX
-          ? "text-red-600"
-          : "text-gray-500"
-      }`}>
-        {photoDescription.length} / {PHOTO_DESC_MAX}
-      </p>
-
-      <button
-        disabled={
-          loading ||
-          !photoFile ||
-          photoDescription.length > PHOTO_DESC_MAX ||
-          storageFull
-        }
-        onClick={() => handleUpload("photos", photoFile)}
-        className="px-4 py-2 rounded-md text-white
-                   bg-[#C48B9F] hover:bg-[#C2A46D]
-                   transition disabled:bg-gray-400"
-      >
-        Subir foto
-      </button>
-
-      <div className="flex flex-wrap gap-4 pt-4">
-        {photos.map((item, index) => {
-          const value =
-            editingDescriptions[item.public_id] ??
-            item.description ?? "";
-          const exceeded = value.length > PHOTO_DESC_MAX;
-
-          return (
-            <div
-              key={item.public_id ?? index}
-              className="w-[140px] bg-[#F5F1EC] p-2 rounded-lg
-                         transition hover:shadow-md"
-            >
-              <img src={item.url} className="rounded mb-1" />
-
-              <textarea
-                value={value}
-                onChange={(e) =>
-                  setEditingDescriptions({
-                    ...editingDescriptions,
-                    [item.public_id]: e.target.value,
-                  })
-                }
-                className={`w-full text-sm border rounded p-1 ${
-                  exceeded ? "border-red-500" : ""
-                }`}
-              />
-
-              <p className={`text-xs ${
-                exceeded ? "text-red-600" : "text-gray-500"
-              }`}>
-                {value.length} / {PHOTO_DESC_MAX}
-              </p>
-
-              <button
-                disabled={exceeded}
-                onClick={() =>
-                  updateMediaDescription("photos", item, value)
-                }
-                className="w-full text-sm mt-1 rounded
-                           bg-[#C48B9F] text-white
-                           hover:bg-[#C2A46D] transition
-                           disabled:bg-gray-400"
-              >
-                Guardar
-              </button>
-
-              <button
-                onClick={() => handleDelete("photos", item)}
-                className="w-full text-sm mt-1 text-red-500 hover:text-red-700"
-              >
-                Eliminar
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-
-        {/* ===================== VIDEOS ===================== */}
-    <div className="bg-white p-5 rounded-xl shadow space-y-4">
-      <h2 className="font-semibold">
-        Videos{" "}
-        <span className="text-sm text-gray-500">
-          (hasta 100 MB, según espacio disponible)
-        </span>
-      </h2>
-
-    <input
-      type="file"
-      accept="video/*"
-      id="videoInput"
-      className="hidden"
-      onChange={(e) =>
-        setVideoFile(e.target.files?.[0] || null)
-      }
-    />
-
-    <button
-      type="button"
-      onClick={() =>
-        document.getElementById("videoInput")?.click()
-      }
-      className="px-4 py-2 rounded-md
-                bg-[#F5F1EC]
-                border border-[#C48B9F]
-                text-[#2E2E2E]
-                font-medium
-                hover:bg-[#C48B9F] hover:text-white
-                transition-all duration-200
-                hover:scale-[1.02]"
-    >
-      Seleccionar video
-    </button>
-
-    <div
-      className={`mt-3 transition-all duration-300 ease-out
-        ${videoFile ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}
-      `}
-    >
-      {videoFile && (
-        <div className="bg-[#F5F1EC] rounded-lg p-3 text-sm text-gray-700">
-          <p>🎥 <span className="font-medium">{videoFile.name}</span></p>
-          <p>📦 {(videoFile.size / 1024 / 1024).toFixed(2)} MB</p>
-
-          <button
-            type="button"
-            onClick={() => setVideoFile(null)}
-            className="text-red-500 hover:text-red-700 text-xs"
-          >
-            Quitar archivo
-          </button>
-        </div>
-      )}
-    </div>
-
-
-  <input
-    type="text"
-    placeholder="Descripción del video"
-    value={videoDescription}
-    onChange={(e) =>
-      setVideoDescription(
-        e.target.value.slice(0, VIDEO_DESC_MAX + 10)
-      )
-    }
-    className={`w-full border rounded-md p-2
-      focus:outline-none focus:ring-2
-      ${
-        videoDescription.length > VIDEO_DESC_MAX
-          ? "border-red-500 focus:ring-red-300"
-          : "focus:ring-[#C48B9F]"
-      }`}
-  />
-
-  <p
-    className={`text-sm ${
-      videoDescription.length > VIDEO_DESC_MAX
-        ? "text-red-600"
-        : "text-gray-500"
-    }`}
-  >
-    {videoDescription.length} / {VIDEO_DESC_MAX}
-  </p>
-
-  <button
-    disabled={
-      loading ||
-      !videoFile ||
-      videoDescription.length > VIDEO_DESC_MAX ||
-      storageFull
-    }
-    onClick={() => handleUpload("videos", videoFile)}
-    className="px-4 py-2 rounded-md text-white
-               bg-[#C48B9F] hover:bg-[#C2A46D]
-               transition-all duration-200
-               hover:scale-[1.02]
-               disabled:bg-gray-400"
-  >
-    Subir video
-  </button>
-
-  {storageFull && (
-    <p className="text-sm text-red-600 animate-pulse">
-      No queda espacio disponible
-    </p>
-  )}
-
-  <div className="flex flex-wrap gap-6 pt-4">
-    {videos.map((item, index) => {
-      const value =
-        editingDescriptions[item.public_id] ??
-        item.description ??
-        "";
-
-      const exceeded = value.length > VIDEO_DESC_MAX;
-
-      return (
-        <div
-          key={item.public_id ?? index}
-          className="w-[240px] bg-[#F5F1EC] p-3 rounded-xl
-                     shadow-sm transition-all duration-300
-                     hover:shadow-lg hover:-translate-y-1"
-        >
-          <video
-            src={item.url}
-            controls
-            className="rounded-lg mb-2 w-full"
+          <AdminPanel
+            isAdmin={user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL}
+            limpiarTodo={limpiarTodo}
           />
 
-          <textarea
-            value={value}
-            onChange={(e) =>
-              setEditingDescriptions({
-                ...editingDescriptions,
-                [item.public_id]: e.target.value,
-              })
-            }
-            className={`w-full text-sm border rounded-md p-2
-              focus:outline-none focus:ring-2
-              ${
-                exceeded
-                  ? "border-red-500 focus:ring-red-300"
-                  : "focus:ring-[#C48B9F]"
-              }`}
+          <BiographySection
+            biography={biography}
+            setBiography={setBiography}
+            saveBiography={saveBiography}
+            bioMax={BIO_MAX}
           />
 
-          <p
-            className={`text-xs mt-1 ${
-              exceeded ? "text-red-600" : "text-gray-500"
-            }`}
-          >
-            {value.length} / {VIDEO_DESC_MAX}
-          </p>
+          <PhotosSection
+            photos={photos}
+            photoFile={photoFile}
+            setPhotoFile={setPhotoFile}
+            photoDescription={photoDescription}
+            setPhotoDescription={setPhotoDescription}
+            handleUpload={handleUpload}
+            updateMediaDescription={updateMediaDescription}
+            handleDelete={handleDelete}
+            loading={loading}
+            storageFull={storageFull}
+            editingDescriptions={editingDescriptions}
+            setEditingDescriptions={setEditingDescriptions}
+            photoDescMax={PHOTO_DESC_MAX}
+          />
 
-          <button
-            disabled={exceeded}
-            onClick={() =>
-              updateMediaDescription("videos", item, value)
-            }
-            className="w-full text-sm mt-2 py-1.5 rounded-md
-                       bg-[#C48B9F] text-white
-                       hover:bg-[#C2A46D]
-                       transition disabled:bg-gray-400"
-          >
-            Guardar
-          </button>
+          <VideosSection
+            videos={videos}
+            videoFile={videoFile}
+            setVideoFile={setVideoFile}
+            videoDescription={videoDescription}
+            setVideoDescription={setVideoDescription}
+            handleUpload={handleUpload}
+            updateMediaDescription={updateMediaDescription}
+            handleDelete={handleDelete}
+            loading={loading}
+            storageFull={storageFull}
+            editingDescriptions={editingDescriptions}
+            setEditingDescriptions={setEditingDescriptions}
+            videoDescMax={VIDEO_DESC_MAX}
+          />
 
-          <button
-            onClick={() => handleDelete("videos", item)}
-            className="w-full text-sm mt-1 text-red-500
-                       hover:text-red-700 transition-colors"
-          >
-            Eliminar
-          </button>
-        </div>
-      );
-    })}
-  </div>
-</div>
-{/* ===================== COMENTARIOS ===================== */}
-<div className="bg-white p-6 rounded-xl shadow space-y-6">
-  <h2 className="text-xl font-semibold">
-    Comentarios{" "}
-  </h2>
+          <CommentsSection
+            comments={comments}
+            commentName={commentName}
+            setCommentName={setCommentName}
+            commentText={commentText}
+            setCommentText={setCommentText}
+            saveComment={saveComment}
+            updateComment={updateComment}
+            deleteComment={deleteComment}
+            editingComment={editingComment}
+            setEditingComment={setEditingComment}
+            editingText={editingText}
+            setEditingText={setEditingText}
+            commentNameMax={COMMENT_NAME_MAX}
+            commentTextMax={COMMENT_TEXT_MAX}
+          />
 
-  {/* NUEVO COMENTARIO */}
-  <div className="bg-[#F5F1EC] p-4 rounded-xl space-y-3">
-    <input
-      type="text"
-      placeholder="Nombre"
-      value={commentName}
-      onChange={(e) =>
-        setCommentName(
-          e.target.value.slice(0, COMMENT_NAME_MAX)
-        )
-      }
-      className="w-full border rounded-md p-2
-                 focus:outline-none focus:ring-2
-                 focus:ring-[#C48B9F]"
-    />
+          <BioToast bioStatus={bioStatus} />
+          <AlertToast alert={alert} />
 
-    <textarea
-      placeholder="Comentario"
-      value={commentText}
-      onChange={(e) =>
-        setCommentText(
-          e.target.value.slice(0, COMMENT_TEXT_MAX)
-        )
-      }
-      className="w-full min-h-[110px] border rounded-md p-2
-                 focus:outline-none focus:ring-2
-                 focus:ring-[#C48B9F]"
-    />
-
-    <p className="text-sm text-gray-500">
-      {commentText.length} / {COMMENT_TEXT_MAX}
-    </p>
-
-    <button
-      onClick={saveComment}
-      className="px-4 py-2 rounded-md text-white
-                 bg-[#C48B9F] hover:bg-[#C2A46D]
-                 transition hover:scale-[1.02]"
-    >
-      Agregar comentario
-    </button>
-  </div>
-
-  {/* LISTADO */}
-  <div className="space-y-4">
-    {comments.map((c) => (
-      <div
-        key={c.id}
-        className="border rounded-xl p-4
-                   transition hover:shadow-md"
-      >
-        <p className="font-semibold">{c.name}</p>
-
-        {editingComment === c.id ? (
-          <>
-            <textarea
-              value={editingText}
-              onChange={(e) =>
-                setEditingText(e.target.value)
-              }
-              className="w-full border rounded-md p-2 mt-2
-                         focus:outline-none focus:ring-2
-                         focus:ring-[#C48B9F]"
-            />
-
-            <div className="flex gap-3 mt-3">
-              <button
-                onClick={() => updateComment(c.id)}
-                className="px-3 py-1 rounded-md text-white
-                           bg-[#C48B9F] hover:bg-[#C2A46D]
-                           transition"
-              >
-                Guardar
-              </button>
-
-              <button
-                onClick={() => {
-                  setEditingComment(null);
-                  setEditingText("");
-                }}
-                className="px-3 py-1 rounded-md bg-gray-300
-                           hover:bg-gray-400 transition"
-              >
-                Cancelar
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="mt-1 text-sm">{c.message}</p>
-
-            <div className="flex gap-4 mt-3 text-sm">
-              <button
-                onClick={() => {
-                  setEditingComment(c.id);
-                  setEditingText(c.message);
-                }}
-                className="text-[#C48B9F] hover:text-[#C2A46D]
-                           transition-colors"
-              >
-                Editar
-              </button>
-
-              <button
-                onClick={() => deleteComment(c.id)}
-                className="text-red-500 hover:text-red-700
-                           transition-colors"
-              >
-                Eliminar
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-  {/* boton de guardar bio  */}
-  {/* ===================== TOAST BIO ===================== */}
-  <div
-    className={`fixed bottom-6 right-6 z-50
-      transition-all duration-300 ease-out
-      ${
-        bioStatus === "idle"
-          ? "opacity-0 translate-y-4 pointer-events-none"
-          : "opacity-100 translate-y-0"
-      }
-    `}
-  >
-    {bioStatus === "saving" && (
-      <div className="bg-[#F5F1EC] border border-[#C2A46D]
-                      text-[#2E2E2E]
-                      px-4 py-3 rounded-lg shadow-lg">
-        💾 Guardando biografía…
-      </div>
-    )}
-
-    {bioStatus === "success" && (
-      <div className="bg-[#C48B9F] text-white
-                      px-4 py-3 rounded-lg shadow-lg">
-        ✓ Biografía actualizada
-      </div>
-    )}
-
-    {bioStatus === "error" && (
-      <div className="bg-red-600 text-white
-                      px-4 py-3 rounded-lg shadow-lg">
-        ✖ Error al guardar la biografía
-      </div>
-    )}
-  </div>
-
-  {alert && (
-    <div
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out ${
-        alert ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-      }`}
-    >
-      {alert.type === "success" && (
-        <div className="bg-[#C48B9F] text-white px-4 py-3 rounded-lg shadow-lg">
-          ✓ {alert.message}
-        </div>
-      )}
-
-      {alert.type === "error" && (
-        <div className="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg">
-          ✖ {alert.message}
-        </div>
-      )}
-
-      {alert.type === "info" && (
-        <div className="bg-[#F5F1EC] border border-[#C2A46D] text-[#2E2E2E] px-4 py-3 rounded-lg shadow-lg">
-          ℹ {alert.message}
-        </div>
-      )}
-    </div>
-  )}
-
-  {/* ===================== CONFIRMACIÓN ===================== */}
-  {showConfirmModal && (
-    <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-[#F5F1EC] border border-[#C2A46D] p-6 rounded-lg shadow-lg w-80">
-        <p className="mb-4 text-[#2E2E2E] font-medium">{confirmMessage}</p>
-        <div className="flex justify-end gap-2">
-          <button
-            className="px-4 py-2 rounded bg-[#F5F1EC] border border-[#C2A46D] text-[#2E2E2E] font-medium hover:bg-[#e6dfd4]"
-            onClick={() => setShowConfirmModal(false)}
-          >
-            Cancelar
-          </button>
-          <button
-            className="px-4 py-2 rounded bg-[#C48B9F] text-white font-medium hover:bg-[#b8738f]"
-            onClick={() => {
-              onConfirmAction(); // ejecuta la acción confirmada
-              setShowConfirmModal(false); // cierra el modal
+          <ConfirmModal
+            show={showConfirmModal}
+            message={confirmMessage}
+            onCancel={() => setShowConfirmModal(false)}
+            onConfirm={() => {
+              onConfirmAction();
+              setShowConfirmModal(false);
             }}
-          >
-            Confirmar
-          </button>
-        </div>
-      </div>
+          />
+        </>
+      </div>     
     </div>
-  )}
-
-
-</div>
-  );
-}
+    );
+  }
