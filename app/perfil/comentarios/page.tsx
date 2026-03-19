@@ -11,8 +11,8 @@ import {
   orderBy,
   Timestamp,
 } from "firebase/firestore";
-import { Link as LinkIcon } from "lucide-react";
-import { ScrollReveal } from "@/components/ScrollReveal"; // tu componente nuevo
+import { Link as LinkIcon, X } from "lucide-react";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 /* ---------- TIPOS ---------- */
 
@@ -36,11 +36,18 @@ type CommentPostProps = {
   name: string;
   message: string;
   timestamp?: string;
+  onOpen: () => void;
 };
 
-const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
+const CommentPost = ({
+  name,
+  message,
+  timestamp,
+  onOpen,
+}: CommentPostProps) => {
   return (
     <div
+      onClick={onOpen}
       className="
         w-full
         max-w-4xl
@@ -53,6 +60,7 @@ const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
         ease-out
         hover:shadow-xl
         hover:-translate-y-1
+        cursor-pointer
       "
       style={{
         backgroundColor: "#F5F1EC",
@@ -62,7 +70,6 @@ const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
     >
       {/* Header */}
       <div className="flex items-start p-6 space-x-4">
-        {/* Avatar */}
         <div
           className="w-14 h-14 rounded-full overflow-hidden border flex-shrink-0"
           style={{ borderColor: "#C2A46D" }}
@@ -77,7 +84,7 @@ const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
         <div>
           <div className="flex items-center flex-wrap gap-x-2">
             <span className="font-semibold text-base">{name}</span>
-            <span className="text-sm italic opacity-70">dejó un recuerdo</span>
+            <span className="text-sm italic text-[#C2A46D]">dejó un recuerdo</span>
           </div>
 
           {timestamp && (
@@ -89,7 +96,7 @@ const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
         </div>
       </div>
 
-      {/* Mensaje centrado */}
+      {/* Mensaje */}
       <div className="px-10 pb-8 text-center">
         <p
           className="
@@ -97,6 +104,7 @@ const CommentPost = ({ name, message, timestamp }: CommentPostProps) => {
             leading-relaxed
             italic
             whitespace-pre-line
+            line-clamp-3
           "
           style={{ color: "#C48B9F" }}
         >
@@ -121,8 +129,8 @@ export default function Comentarios() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
 
-  /* PERFIL */
   useEffect(() => {
     const fetchProfile = async () => {
       const ref = doc(db, "profiles", PROFILE_ID);
@@ -138,13 +146,9 @@ export default function Comentarios() {
     fetchProfile();
   }, []);
 
-  /* COMENTARIOS */
   useEffect(() => {
     const fetchComments = async () => {
-      const q = query(
-        collection(db, "comments"),
-        orderBy("createdAt", "desc")
-      );
+      const q = query(collection(db, "comments"), orderBy("createdAt", "desc"));
 
       const snap = await getDocs(q);
 
@@ -159,11 +163,9 @@ export default function Comentarios() {
     fetchComments();
   }, []);
 
-  /* GUARDS */
   if (loading) return <p className="p-8">Cargando…</p>;
   if (!profile) return <p className="p-8">Perfil no encontrado</p>;
 
-  /* RENDER */
   return (
     <main className="px-4 md:px-10 py-10 min-h-screen bg-[#F5F1EC]">
       <div className="space-y-16">
@@ -181,11 +183,70 @@ export default function Comentarios() {
                 name={c.name}
                 message={c.message}
                 timestamp={date}
+                onOpen={() => setSelectedComment(c)}
               />
             </ScrollReveal>
           );
         })}
       </div>
+
+      {/* MODAL */}
+      {selectedComment && (
+        <div
+          className="
+            fixed inset-0 z-50
+            bg-black/70
+            backdrop-blur-sm
+            flex items-center justify-center
+            p-4
+          "
+          onClick={() => setSelectedComment(null)}
+        >
+          <div
+            className="
+              bg-white
+              rounded-2xl
+              max-w-3xl
+              w-full
+              shadow-2xl
+              relative
+              p-8 md:p-10
+            "
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* cerrar */}
+            <button
+              onClick={() => setSelectedComment(null)}
+              className="
+                absolute top-4 right-4
+                bg-white/90
+                rounded-full p-2
+              "
+            >
+              <X size={18} />
+            </button>
+
+            <h3 className="text-xl font-semibold text-[#2E2E2E] mb-4 text-center">
+              {selectedComment.name}
+            </h3>
+
+            <p className="text-[#C48B9F] italic text-lg leading-relaxed whitespace-pre-line text-center">
+              “{selectedComment.message}”
+            </p>
+
+            {selectedComment.createdAt && (
+              <p className="text-sm text-[#1F1F1F]/50 text-center mt-6">
+                {new Date(
+                  selectedComment.createdAt.seconds * 1000
+                ).toLocaleString("es-PE", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -3,8 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
-import { Link as LinkIcon } from "lucide-react";
-import { ScrollReveal } from "@/components/ScrollReveal"; // tu componente nuevo
+import { Link as LinkIcon, X } from "lucide-react";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 /* ---------- TIPOS ---------- */
 
@@ -35,9 +35,15 @@ type PhotoPostProps = {
   timestamp: string;
   content: string;
   imageUrl: string;
+  onOpen: () => void;
 };
 
-const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
+const PhotoPost = ({
+  timestamp,
+  content,
+  imageUrl,
+  onOpen,
+}: PhotoPostProps) => {
   return (
     <div
       className="
@@ -61,7 +67,6 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
     >
       {/* Header */}
       <div className="flex items-start p-6 space-x-4">
-        {/* Avatar */}
         <div
           className="w-14 h-14 rounded-full overflow-hidden border flex-shrink-0"
           style={{ borderColor: "#C2A46D" }}
@@ -76,7 +81,7 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         <div>
           <div className="flex items-center flex-wrap gap-x-2">
             <span className="font-semibold text-base">{AUTHOR_NAME}</span>
-            <span className="text-sm italic opacity-70">uploaded 1 photo</span>
+            <span className="text-sm italic text-[#C2A46D]">compartió una fotografía</span>
           </div>
 
           <div className="flex items-center text-xs mt-1 opacity-70">
@@ -98,12 +103,15 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
         </div>
       )}
 
-      {/* Imagen */}
-      <div className="w-full bg-white flex justify-center overflow-hidden">
+      {/* Imagen clickable */}
+      <div
+        className="w-full bg-white flex justify-center overflow-hidden cursor-pointer"
+        onClick={onOpen}
+      >
         <img
           src={imageUrl}
           alt={content}
-          loading="lazy" // lazy load
+          loading="lazy"
           className="
             max-h-[345px]
             w-full
@@ -132,8 +140,8 @@ const PhotoPost = ({ timestamp, content, imageUrl }: PhotoPostProps) => {
 export default function Fotos() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState<MediaItem | null>(null);
 
-  /* PERFIL */
   useEffect(() => {
     const fetchProfile = async () => {
       const ref = doc(db, "profiles", PROFILE_ID);
@@ -149,7 +157,6 @@ export default function Fotos() {
     fetchProfile();
   }, []);
 
-  /* TIMELINE */
   const timeline = useMemo<TimelineItem[]>(() => {
     if (!profile?.photos) return [];
 
@@ -159,11 +166,9 @@ export default function Fotos() {
       .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
   }, [profile]);
 
-  /* GUARDS */
   if (loading) return <p className="p-8">Cargando…</p>;
   if (!profile) return <p className="p-8">Perfil no encontrado</p>;
 
-  /* RENDER */
   return (
     <main className="px-4 md:px-10 py-10 min-h-screen bg-[#F5F1EC]">
       <div className="space-y-16">
@@ -179,11 +184,70 @@ export default function Fotos() {
                 timestamp={date}
                 content={item.data.description || ""}
                 imageUrl={item.data.url}
+                onOpen={() => setSelectedPhoto(item.data)}
               />
             </ScrollReveal>
           );
         })}
       </div>
+
+      {/* MODAL */}
+      {selectedPhoto && (
+        <div
+          className="
+            fixed inset-0 z-50
+            bg-black/70
+            backdrop-blur-sm
+            flex items-center justify-center
+            p-4
+          "
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div
+            className="
+              bg-white
+              rounded-2xl
+              max-w-5xl
+              w-full
+              overflow-hidden
+              shadow-2xl
+              relative
+            "
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* cerrar */}
+            <button
+              onClick={() => setSelectedPhoto(null)}
+              className="
+                absolute top-4 right-4 z-10
+                bg-white/90
+                rounded-full p-2
+                hover:bg-white
+              "
+            >
+              <X size={18} />
+            </button>
+
+            {/* imagen */}
+            <div className="bg-[#F5F1EC] flex justify-center">
+              <img
+                src={selectedPhoto.url}
+                alt={selectedPhoto.description}
+                className="max-h-[80vh] w-full object-contain"
+              />
+            </div>
+
+            {/* descripción */}
+            {selectedPhoto.description && (
+              <div className="p-6 text-center">
+                <p className="italic text-[#C48B9F] text-lg">
+                  “{selectedPhoto.description}”
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

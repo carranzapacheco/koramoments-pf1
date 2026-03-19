@@ -8,130 +8,143 @@ import { motion } from 'framer-motion'
 
 export const Footer: React.FC = () => {
   const socialVariants = {
-    hover: { scale: 1.2, color: '#C2A46D', transition: { duration: 0.3 } },
+    hover: {
+      scale: 1.15,
+      color: '#C2A46D',
+      transition: { duration: 0.25 }
+    },
   }
 
   const linkVariants = {
-    hover: { scale: 1.05, color: '#C48B9F', transition: { duration: 0.3 } },
+    hover: {
+      scale: 1.03,
+      color: '#C2A46D',
+      transition: { duration: 0.25 }
+    },
   }
 
   return (
-    <footer className="bg-[#E0D8C5] text-[#2E2E2E] py-8 px-6 md:px-16 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between gap-8 items-center md:items-start">
+    <footer className="bg-[#EFE7DD] border-t border-[#C2A46D]/15 text-[#2E2E2E] py-10 px-6 md:px-16">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10 items-center md:items-start">
 
-        {/* Logo centrado */}
-        <div className="flex flex-col items-center text-center">
+        {/* Logo */}
+        <div className="flex flex-col items-center md:items-start text-center md:text-left">
           <Image
             src="/Logo-full.png"
             alt="Kora Memories"
-            width={400}
-            height={120}
+            width={300}
+            height={90}
             priority
-            className="mb-2 drop-shadow-xl p-2"
+            className="mb-3"
           />
+          <p className="text-sm text-[#1F1F1F]/70 max-w-xs leading-relaxed">
+            Preservando recuerdos con amor, respeto y significado.
+          </p>
         </div>
 
-        {/* Contacto y redes */}
-        <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-6">
-          <div>
-            <h3 className="text-md font-bold mb-2">Contáctanos</h3>
-            <ul className="space-y-1 text-sm">
-              <motion.li whileHover={{ scale: 1.05 }}>
-                <a
-                  href="https://wa.me/51914824316"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#C48B9F] justify-center md:justify-start transition-colors"
-                >
-                  <FaWhatsapp size={16} /> +51 914 824 316
-                </a>
-              </motion.li>
-              <motion.li whileHover={{ scale: 1.05 }}>
-                <a
-                  href="mailto:carranzapacheco.f.a@gmail.com"
-                  className="text-[#C48B9F] transition-colors"
-                >
-                  carranzapacheco.f.a@gmail.com
-                </a>
-              </motion.li>
-              <li className="text-sm">Trujillo - La Libertad, Perú</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-md font-bold mb-2">Síguenos</h3>
-            <div className="flex justify-center md:justify-start gap-3">
-              <motion.a
-                href="https://facebook.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                variants={socialVariants}
-                whileHover="hover"
-                className="text-[#C48B9F]"
-              >
-                <FaFacebookF size={18} />
-              </motion.a>
-
-              <motion.a
-                href="https://instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                variants={socialVariants}
-                whileHover="hover"
-                className="text-[#C48B9F]"
-              >
-                <FaInstagram size={18} />
-              </motion.a>
-
-              <motion.a
-                href="https://tiktok.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                variants={socialVariants}
-                whileHover="hover"
-                className="bg-[#C48B9F] p-1.5 rounded-md text-white"
-              >
-                <FaTiktok size={14} />
-              </motion.a>
-            </div>
-          </div>
-        </div>
-
-        {/* Links */}
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <h3 className="text-md font-bold mb-2">Enlaces</h3>
+        {/* Contacto */}
+        <div className="text-center md:text-left">
+          <h3 className="text-[#C48B9F] font-semibold mb-3">
+            Contáctanos
+          </h3>
 
           <ul className="space-y-2 text-sm">
-            {/* Inicio */}
-            <motion.li variants={linkVariants} whileHover="hover">
-              <Link href="/" className="transition-colors">
-                Inicio
-              </Link>
+            <motion.li whileHover={{ scale: 1.03 }}>
+              <a
+                href="https://wa.me/51914824316"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 justify-center md:justify-start text-[#2E2E2E]"
+              >
+                <FaWhatsapp size={15} />
+                +51 914 824 316
+              </a>
             </motion.li>
 
-            {/* Términos y Condiciones (DESCARGA PDF) */}
-            <motion.li variants={linkVariants} whileHover="hover">
+            <motion.li whileHover={{ scale: 1.03 }}>
               <a
-                href="/terminos y condiciones.pdf"
-                download
-                className="transition-colors"
+                href="mailto:carranzapacheco.f.a@gmail.com"
+                className="text-[#2E2E2E]"
               >
+                carranzapacheco.f.a@gmail.com
+              </a>
+            </motion.li>
+
+            <li className="text-[#1F1F1F]/70">
+              Trujillo - La Libertad, Perú
+            </li>
+          </ul>
+        </div>
+
+        {/* Enlaces */}
+        <div className="text-center md:text-left">
+          <h3 className="text-[#C48B9F] font-semibold mb-3">
+            Enlaces
+          </h3>
+
+          <ul className="space-y-2 text-sm">
+            <motion.li variants={linkVariants} whileHover="hover">
+              <Link href="/">Inicio</Link>
+            </motion.li>
+
+            <motion.li variants={linkVariants} whileHover="hover">
+              <a href="/terminos y condiciones.pdf" download>
                 Términos y Condiciones
               </a>
             </motion.li>
 
-            {/* Ayuda */}
             <motion.li variants={linkVariants} whileHover="hover">
-              <Link href="/ayuda" className="transition-colors">
-                Ayuda
-              </Link>
+              <Link href="/ayuda">Ayuda</Link>
             </motion.li>
           </ul>
         </div>
 
+        {/* Redes */}
+        <div className="text-center md:text-left">
+          <h3 className="text-[#C48B9F] font-semibold mb-3">
+            Síguenos
+          </h3>
+
+          <div className="flex gap-4 justify-center md:justify-start">
+            <motion.a
+              href="https://facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              variants={socialVariants}
+              whileHover="hover"
+              className="text-[#2E2E2E]"
+            >
+              <FaFacebookF size={17} />
+            </motion.a>
+
+            <motion.a
+              href="https://instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              variants={socialVariants}
+              whileHover="hover"
+              className="text-[#2E2E2E]"
+            >
+              <FaInstagram size={17} />
+            </motion.a>
+
+            <motion.a
+              href="https://tiktok.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              variants={socialVariants}
+              whileHover="hover"
+              className="text-[#2E2E2E]"
+            >
+              <FaTiktok size={16} />
+            </motion.a>
+          </div>
+        </div>
+      </div>
+
+      {/* Línea inferior */}
+      <div className="mt-8 pt-5 border-t border-[#C2A46D]/10 text-center text-xs text-[#1F1F1F]/60">
+        © 2026 Kora Memories. Todos los derechos reservados.
       </div>
     </footer>
   )
