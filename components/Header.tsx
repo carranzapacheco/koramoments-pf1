@@ -98,7 +98,7 @@ export const Header = () => {
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-[#EFE7DD] border-b border-[#C2A46D] px-6 py-5 flex flex-col gap-4 shadow-sm"
+            className="md:hidden bg-[#EFE7DD] border-b border-[#C2A46D] px-6 py-5 flex flex-col gap-4 shadow-sm text-center"
           >
             {navLinks.map((link) => (
               <motion.div key={link.href} whileHover={linkHover}>
